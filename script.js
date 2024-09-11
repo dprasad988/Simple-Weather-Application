@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
                 fetchWeatherByCoordinates(latitude, longitude, unit);
-            });
+            }, error => console.error('Geolocation error:', error));
         }
     });
 
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         navigator.geolocation.getCurrentPosition(position => {
             const { latitude, longitude } = position.coords;
             fetchWeatherByCoordinates(latitude, longitude, unit);
-        });
+        }, error => console.error('Geolocation error:', error));
     } else {
         console.error('Geolocation is not supported by this browser.');
     }
@@ -47,7 +47,7 @@ function displayWeatherForCity(city, unit, detailed = false) {
     const apiKey = '5f3fe64e27274785b4082120241109'; 
     const unitLabel = unit === 'metric' ? '°C' : '°F';
     const speedUnit = unit === 'metric' ? ' km/h' : ' mph';
-    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -63,7 +63,7 @@ function displayWeatherForCity(city, unit, detailed = false) {
                 </div>
             `;
             if (detailed) {
-                const forecastApiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
+                const forecastApiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
                 fetch(forecastApiUrl)
                     .then(response => response.json())
                     .then(forecastData => {
@@ -84,6 +84,10 @@ function displayWeatherForCity(city, unit, detailed = false) {
                                 </div>
                             </div>
                         `;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching forecast data:', error);
+                        document.getElementById('cityWeatherDetails').innerHTML = `<div class="col-md-12 city-weather"><p>Forecast data not available for ${city}.</p></div>`;
                     });
             } else {
                 const container = document.querySelector('#topCitiesWeather');
@@ -91,7 +95,7 @@ function displayWeatherForCity(city, unit, detailed = false) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching weather data:', error);
             if (detailed) {
                 document.getElementById('cityWeatherDetails').innerHTML = `<div class="col-md-12 city-weather"><p>Weather data not available for ${city}.</p></div>`;
             } else {
@@ -104,7 +108,7 @@ function fetchWeatherByCoordinates(latitude, longitude, unit) {
     const apiKey = '5f3fe64e27274785b4082120241109';
     const unitLabel = unit === 'metric' ? '°C' : '°F';
     const speedUnit = unit === 'metric' ? ' km/h' : ' mph';
-    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${latitude},${longitude}&aqi=no`;
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${latitude},${longitude}&aqi=no`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -123,7 +127,7 @@ function fetchWeatherByCoordinates(latitude, longitude, unit) {
             container.innerHTML = weatherHtml + container.innerHTML;
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching weather data by coordinates:', error);
             const container = document.querySelector('#cityWeatherDetails');
             container.innerHTML = `<div class="col-md-4 city-weather border"><p>Weather data not available for current location.</p></div>` + container.innerHTML;
         });

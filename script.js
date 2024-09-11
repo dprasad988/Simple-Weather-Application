@@ -2,15 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const cities = ['Colombo', 'Kahawatta', 'Ratnapura'];
     let unit = 'metric';
 
-    // Initialize weather for top cities
     updateWeatherForTopCities(unit);
 
-    // Toggle unit on button click
     document.getElementById('unitToggle').addEventListener('click', function() {
         unit = unit === 'metric' ? 'imperial' : 'metric';
         this.textContent = unit === 'metric' ? 'Switch to Imperial' : 'Switch to Metric';
         updateWeatherForTopCities(unit);
-        // Optionally update the current location weather as well
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
@@ -19,15 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Search button event listener
     document.getElementById('getWeather').addEventListener('click', function() {
         const city = document.getElementById('city').value;
         if (city) {
-            displayWeatherForCity(city, unit, true); // true for detailed view
+            displayWeatherForCity(city, unit, true);
         }
     });
 
-    // Get weather for current location
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
             const { latitude, longitude } = position.coords;
@@ -49,7 +44,7 @@ function updateWeatherForTopCities(unit) {
 }
 
 function displayWeatherForCity(city, unit, detailed = false) {
-    const apiKey = '5f3fe64e27274785b4082120241109'; // Use your actual WeatherAPI key
+    const apiKey = '5f3fe64e27274785b4082120241109'; 
     const unitLabel = unit === 'metric' ? '°C' : '°F';
     const speedUnit = unit === 'metric' ? ' km/h' : ' mph';
     const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
@@ -68,7 +63,6 @@ function displayWeatherForCity(city, unit, detailed = false) {
                 </div>
             `;
             if (detailed) {
-                // For searched city
                 const forecastApiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
                 fetch(forecastApiUrl)
                     .then(response => response.json())
@@ -92,7 +86,6 @@ function displayWeatherForCity(city, unit, detailed = false) {
                         `;
                     });
             } else {
-                // For top cities
                 const container = document.querySelector('#topCitiesWeather');
                 container.innerHTML += weatherHtml;
             }
@@ -108,7 +101,7 @@ function displayWeatherForCity(city, unit, detailed = false) {
 }
 
 function fetchWeatherByCoordinates(latitude, longitude, unit) {
-    const apiKey = '5f3fe64e27274785b4082120241109'; 
+    const apiKey = '5f3fe64e27274785b4082120241109';
     const unitLabel = unit === 'metric' ? '°C' : '°F';
     const speedUnit = unit === 'metric' ? ' km/h' : ' mph';
     const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${latitude},${longitude}&aqi=no`;
@@ -126,13 +119,12 @@ function fetchWeatherByCoordinates(latitude, longitude, unit) {
                     <p><strong>Wind Speed:</strong> ${unit === 'metric' ? data.current.wind_kph : data.current.wind_mph}${speedUnit}</p>
                 </div>
             `;
-            // Display current location weather in the top cities container
-            const container = document.querySelector('#topCitiesWeather');
+            const container = document.querySelector('#cityWeatherDetails');
             container.innerHTML = weatherHtml + container.innerHTML;
         })
         .catch(error => {
             console.error('Error:', error);
-            const container = document.querySelector('#topCitiesWeather');
+            const container = document.querySelector('#cityWeatherDetails');
             container.innerHTML = `<div class="col-md-4 city-weather border"><p>Weather data not available for current location.</p></div>` + container.innerHTML;
         });
 }
